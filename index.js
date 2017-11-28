@@ -2,6 +2,7 @@
 'use strict';
 
 
+const Fs = require('fs');
 var Punycode = require('punycode');
 
 
@@ -28,6 +29,44 @@ internals.ruleObject = function (rule) {
 //
 internals.rules = require('./data/rules.json').map(internals.ruleObject);
 
+
+//
+// Parse rule line (trim and ignore empty lines and comments).
+//
+internals.parseLine = function (line) {
+
+  const trimmed = line.trim();
+
+  // Ignore empty lines and comments.
+  if (!trimmed || (trimmed.charAt(0) === '/' && trimmed.charAt(1) === '/')) {
+    return;
+  }
+
+  // Only read up to first whitespace char.
+  const rule = trimmed.split(' ')[0];
+
+  return internals.ruleObject(rule);
+};
+
+
+//
+// Load rule data from file (synchronous).
+//
+exports.loadData = function (dataFile) {
+
+  const data = Fs.readFileSync(dataFile);
+  internals.rules =
+    data.toString()
+      .split(/\r?\n/)
+      .map(internals.parseLine)
+      // Omit undefined values
+      .filter(function (e) {
+
+        return e;
+      });
+
+  return this;
+};
 
 //
 // Check is given string ends with `suffix`.
