@@ -9,9 +9,9 @@ var internals = {};
 
 
 //
-// Read rules from file.
+// Create a rule object.
 //
-internals.rules = require('./data/rules.json').map(function (rule) {
+internals.ruleObject = function (rule) {
 
   return {
     rule: rule,
@@ -20,7 +20,13 @@ internals.rules = require('./data/rules.json').map(function (rule) {
     wildcard: rule.charAt(0) === '*',
     exception: rule.charAt(0) === '!'
   };
-});
+};
+
+
+//
+// Read rules from file.
+//
+internals.rules = require('./data/rules.json').map(internals.ruleObject);
 
 
 //
